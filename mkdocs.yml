@@ -3,7 +3,7 @@ site_description: Build and execution dynamic expression
 repo_url: https://github.com/waku-py/dynamic-expressions
 
 nav:
-  - About: about.md
+  - About: index.md
   - Nodes and visitors: nodes.md
   - Dispatcher: dispatcher.md
   - Extensions: extensions.md
