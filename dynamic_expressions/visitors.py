@@ -1,6 +1,7 @@
 import abc
 import operator
-from collections.abc import Callable, Mapping
+import warnings
+from collections.abc import Callable, Container, Mapping
 from functools import reduce
 from typing import Any, ClassVar, Protocol
 
@@ -66,6 +67,20 @@ def _visit_getattr(value: Any, properties: Any) -> object:  # noqa: ANN401
     return reduce(getattr, properties.split("."), value)
 
 
+def _visit_in(left: Any, right: Any) -> bool:  # noqa: ANN401
+    if isinstance(left, Container) and not isinstance(right, Container):
+        warnings.warn(
+            (
+                'BinaryExpressionNode(operator="in", left=<container>, right=<search value>) is depricated, '
+                'use BinaryExpressionNode(operator="in", left=<search value>, right=<container>)'
+            ),
+            category=DeprecationWarning,
+            stacklevel=2,
+        )
+        return operator.contains(left, right)
+    return operator.contains(right, left)
+
+
 class BinaryExpressionVisitor(Visitor[BinaryExpressionNode, EmptyContext]):
     operator_mapping: ClassVar[
         Mapping[BinaryExpressionOperator, Callable[[Any, Any], object]]
@@ -76,7 +91,7 @@ class BinaryExpressionVisitor(Visitor[BinaryExpressionNode, EmptyContext]):
         "<": operator.lt,
         "<=": operator.le,
         "!=": operator.ne,
-        "in": operator.contains,
+        "in": _visit_in,
         "+": operator.add,
         "-": operator.sub,
         "*": operator.mul,

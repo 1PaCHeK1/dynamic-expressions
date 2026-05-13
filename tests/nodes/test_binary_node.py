@@ -71,3 +71,35 @@ async def test_getattr(
         operator="getattr", left=LiteralNode(left), right=LiteralNode(right)
     )
     assert await dispatcher.visit(node, None) == expected
+
+
+async def test_in_warning(
+    dispatcher: VisitorDispatcher[EmptyContext],
+) -> None:
+    node = BinaryExpressionNode(
+        operator="in", left=LiteralNode(value=(1, 2, 3)), right=LiteralNode(1)
+    )
+    with pytest.warns(
+        DeprecationWarning,
+        match=(
+            r'BinaryExpressionNode\(operator="in", left=<container>, right=<search value>\) is depricated, '
+            r'use BinaryExpressionNode\(operator="in", left=<search value>, right=<container>\)'
+        ),
+    ):
+        assert await dispatcher.visit(node, None)
+
+
+@pytest.mark.parametrize(
+    "left",
+    [LiteralNode(1), LiteralNode((1, 2))],
+)
+async def test_in_without_warning(
+    left: LiteralNode,
+    dispatcher: VisitorDispatcher[EmptyContext],
+) -> None:
+    node = BinaryExpressionNode(
+        operator="in",
+        left=left,
+        right=LiteralNode((1, 2, 3, (1, 2))),
+    )
+    assert await dispatcher.visit(node, None)
