@@ -82,7 +82,7 @@ async def test_in_warning(
     with pytest.warns(
         DeprecationWarning,
         match=(
-            r'BinaryExpressionNode\(operator="in", left=<container>, right=<search value>\) is depricated, '
+            r'BinaryExpressionNode\(operator="in", left=<container>, right=<search value>\) is deprecated, '
             r'use BinaryExpressionNode\(operator="in", left=<search value>, right=<container>\)'
         ),
     ):

@@ -71,7 +71,7 @@ def _visit_in(left: Any, right: Any) -> bool:  # noqa: ANN401
     if isinstance(left, Container) and not isinstance(right, Container):
         warnings.warn(
             (
-                'BinaryExpressionNode(operator="in", left=<container>, right=<search value>) is depricated, '
+                'BinaryExpressionNode(operator="in", left=<container>, right=<search value>) is deprecated, '
                 'use BinaryExpressionNode(operator="in", left=<search value>, right=<container>)'
             ),
             category=DeprecationWarning,
