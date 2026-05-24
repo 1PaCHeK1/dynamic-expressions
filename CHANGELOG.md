@@ -1,3 +1,15 @@
+## 0.2.2 (2026-05-24)
+
+### Feat
+
+- ast parser (ExpressionEvalParser)
+
+### Fix
+
+- correct spelling of 'deprecated' in warning messages
+- gh pages
+- workflow
+
 ## 0.2.1 (2025-12-15)
 
 ### Feat
