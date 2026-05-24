@@ -26,18 +26,18 @@ serialization-msgspec = [
 
 [dependency-groups]
 dev = [
-    "anyio>=4.8.0",
+    "anyio>=4.13.0",
     "commitizen",
-    "coverage>=7.6.10",
+    "coverage>=7.14.0",
     "deptry>=0.25.1",
     "mkdocs>=1.6.1",
     "mkdocs-material>=9.6.12",
     "mkdocstrings[python]>=0.29.1",
-    "mypy>=1.19.1",
-    "pytest>=8.3.4",
+    "mypy>=2.1.0",
+    "pytest>=9.0.3",
     "redis>=5.2.1",
-    "ruff>=0.15.7",
-    "testcontainers>=4.9.1",
+    "ruff>=0.15.12",
+    "testcontainers>=4.14.2",
     "types-redis>=4.6.0.20241004",
 ]
 
