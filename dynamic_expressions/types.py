@@ -12,6 +12,15 @@ class ExecutionContext:
     cache: dict[Node, Any] = field(default_factory=dict)
 
 
+UnaryExpressionOperator = Literal[
+    "+",
+    "-",
+    "~",
+    "abs",
+    "not",
+]
+
+
 BinaryExpressionOperator = Literal[
     "=",
     ">",
@@ -25,6 +34,7 @@ BinaryExpressionOperator = Literal[
     "*",
     "/",
     "//",
+    "%",
     "^",
     "&",
     "|",

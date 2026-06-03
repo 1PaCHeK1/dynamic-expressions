@@ -14,3 +14,12 @@ async def test_ok(
 ) -> None:
     node = LiteralNode(value=value)
     assert value == await dispatcher.visit(node, None)
+
+
+async def test_list_with_node(
+    dispatcher: VisitorDispatcher[EmptyContext],
+) -> None:
+
+    node = LiteralNode((1, 2, 3, LiteralNode(4)))
+    expected_value = (1, 2, 3, 4)
+    assert expected_value == await dispatcher.visit(node, None)

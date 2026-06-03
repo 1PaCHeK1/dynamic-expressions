@@ -11,11 +11,17 @@ from dynamic_expressions.nodes import (
     BinaryExpressionNode,
     CaseNode,
     CoalesceNode,
+    FromContextNode,
     LiteralNode,
     MatchNode,
     Node,
+    UnaryExpressionNode,
 )
-from dynamic_expressions.types import BinaryExpressionOperator, EmptyContext
+from dynamic_expressions.types import (
+    BinaryExpressionOperator,
+    EmptyContext,
+    UnaryExpressionOperator,
+)
 
 
 class Dispatch[TContext: EmptyContext](Protocol):
@@ -63,6 +69,33 @@ class AllOfVisitor(Visitor[AllOfNode, EmptyContext]):
         return True
 
 
+class UnaryExpressionVisitor(Visitor[UnaryExpressionNode, EmptyContext]):
+    operator_mapping: ClassVar[
+        Mapping[UnaryExpressionOperator, Callable[[Any], object]]
+    ] = {
+        "+": operator.pos,
+        "-": operator.neg,
+        "~": operator.inv,
+        "abs": operator.abs,
+        "not": operator.not_,
+    }
+
+    async def visit(
+        self,
+        *,
+        node: UnaryExpressionNode,
+        dispatch: Dispatch[EmptyContext],
+        context: EmptyContext,
+    ) -> object:
+        operator_callable = self.operator_mapping.get(node.operator)
+        if operator_callable is None:
+            msg = f"Unknown operator '{node.operator}'"
+            raise ValueError(msg)
+
+        value = await dispatch(node.value, context)
+        return operator_callable(value)
+
+
 def _visit_getattr(value: Any, properties: Any) -> object:  # noqa: ANN401
     return reduce(getattr, properties.split("."), value)
 
@@ -97,6 +130,7 @@ class BinaryExpressionVisitor(Visitor[BinaryExpressionNode, EmptyContext]):
         "*": operator.mul,
         "/": operator.truediv,
         "//": operator.floordiv,
+        "%": operator.mod,
         "^": operator.pow,
         "&": operator.and_,
         "|": operator.or_,
@@ -111,13 +145,12 @@ class BinaryExpressionVisitor(Visitor[BinaryExpressionNode, EmptyContext]):
         dispatch: Dispatch[EmptyContext],
         context: EmptyContext,
     ) -> object:
-        left = await dispatch(node.left, context)
-        right = await dispatch(node.right, context)
-
         operator_callable = self.operator_mapping.get(node.operator)
         if operator_callable is None:
             msg = f"Unknown operator '{node.operator}'"
             raise ValueError(msg)
+        left = await dispatch(node.left, context)
+        right = await dispatch(node.right, context)
         return operator_callable(left, right)
 
 
@@ -126,9 +159,16 @@ class LiteralVisitor(Visitor[LiteralNode, EmptyContext]):
         self,
         *,
         node: LiteralNode,
-        dispatch: Dispatch[EmptyContext],  # noqa: ARG002
-        context: EmptyContext,  # noqa: ARG002
+        dispatch: Dispatch[EmptyContext],
+        context: EmptyContext,
     ) -> Any:  # noqa: ANN401
+        if isinstance(node.value, (tuple, list)):
+            return tuple(
+                [
+                    await dispatch(item, context) if isinstance(item, Node) else item
+                    for item in node.value
+                ]
+            )
         return node.value
 
 
@@ -175,3 +215,18 @@ class MatchVisitor(Visitor[MatchNode, EmptyContext]):
 
         msg = "MatchCase doesn't find CaseNode with the appropriate expression"
         raise ValueError(msg)
+
+
+class FromContextNodeVisitor[TContext](Visitor[FromContextNode, TContext]):
+    async def visit(
+        self,
+        *,
+        node: FromContextNode,
+        dispatch: Dispatch[TContext],  # noqa: ARG002
+        context: TContext,
+    ) -> Any:  # noqa: ANN401
+        try:
+            return _visit_getattr(context, node.field_name)
+        except AttributeError as e:
+            msg = f"Field '{node.field_name}' not found in context of type '{context.__class__.__qualname__}'"
+            raise AttributeError(msg) from e

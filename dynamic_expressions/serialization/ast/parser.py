@@ -1,6 +1,7 @@
 import ast
 from collections.abc import Sequence
 from dataclasses import dataclass
+from typing import Any
 
 from dynamic_expressions.nodes import Node
 from dynamic_expressions.serialization.ast.handlers import ExpressionHandler
@@ -15,7 +16,7 @@ class UnknownAstNodeError(Exception):
 
 
 class ExpressionEvalParser:
-    def __init__(self, handlers: Sequence[ExpressionHandler[ast.AST, Node]]) -> None:
+    def __init__(self, handlers: Sequence[ExpressionHandler[Any, Node]]) -> None:
         self._handlers = handlers
 
     def parse(self, expression: str) -> Node | None:

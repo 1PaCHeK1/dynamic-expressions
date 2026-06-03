@@ -10,11 +10,13 @@ from dynamic_expressions.nodes import (
     BinaryExpressionNode,
     CaseNode,
     CoalesceNode,
+    FromContextNode,
     LiteralNode,
     MatchNode,
     Node,
+    UnaryExpressionNode,
 )
-from dynamic_expressions.types import BinaryExpressionOperator
+from dynamic_expressions.types import BinaryExpressionOperator, UnaryExpressionOperator
 
 from ._serialization import Serializer
 
@@ -42,6 +44,18 @@ class AllOfNodeSchema[T: NodeSchema](NodeSchema):
 
     def to_node(self) -> AllOfNode:
         return AllOfNode(expressions=tuple(expr.to_node() for expr in self.expressions))
+
+
+class UnaryExpressionNodeSchema[T: NodeSchema](NodeSchema):
+    type: Literal["unary"]
+    operator: UnaryExpressionOperator
+    value: T
+
+    def to_node(self) -> UnaryExpressionNode:
+        return UnaryExpressionNode(
+            operator=self.operator,
+            value=self.value.to_node(),
+        )
 
 
 class BinaryExpressionNodeSchema[T: NodeSchema](NodeSchema):
@@ -98,14 +112,24 @@ class MatchNodeSchema[T: NodeSchema](NodeSchema):
         )
 
 
+class FromContextNodeSchema[T: NodeSchema](NodeSchema):
+    type: Literal["from-context"]
+    field_name: str
+
+    def to_node(self) -> FromContextNode:
+        return FromContextNode(field_name=self.field_name)
+
+
 BUILTIN_SCHEMAS: Sequence[type[NodeSchema]] = [
     AnyOfNodeSchema,
     AllOfNodeSchema,
+    UnaryExpressionNodeSchema,
     BinaryExpressionNodeSchema,
     LiteralNodeSchema,
     CoalesceNodeSchema,
     CaseNodeSchema,
     MatchNodeSchema,
+    FromContextNodeSchema,
 ]
 
 
