@@ -3,9 +3,20 @@ from collections.abc import Mapping, Sequence
 from typing import Any, Protocol
 
 from dynamic_expressions import nodes
-from dynamic_expressions.types import BinaryExpressionOperator
+from dynamic_expressions.types import BinaryExpressionOperator, UnaryExpressionOperator
 
-OPERATOR_MAPPING: Mapping[
+UNARY_OPERATOR_MAPPING: Mapping[
+    type[ast.unaryop],
+    UnaryExpressionOperator,
+] = {
+    ast.UAdd: "+",
+    ast.USub: "-",
+    ast.Invert: "~",
+    ast.Not: "not",
+}
+
+
+BINARY_OPERATOR_MAPPING: Mapping[
     type[ast.operator | ast.cmpop],
     BinaryExpressionOperator,
 ] = {
@@ -27,8 +38,16 @@ OPERATOR_MAPPING: Mapping[
 }
 
 
-def _map_op(node: ast.operator | ast.cmpop) -> BinaryExpressionOperator:
-    operator = OPERATOR_MAPPING.get(type(node))
+def _map_unary_op(node: ast.unaryop) -> UnaryExpressionOperator:
+    operator = UNARY_OPERATOR_MAPPING.get(type(node))
+    if operator is None:
+        msg = f"Unknown operator '{node.__class__.__qualname__}'"
+        raise ValueError(msg)
+    return operator
+
+
+def _map_binary_op(node: ast.operator | ast.cmpop) -> BinaryExpressionOperator:
+    operator = BINARY_OPERATOR_MAPPING.get(type(node))
     if operator is None:
         msg = f"Unknown operator '{node.__class__.__qualname__}'"
         raise ValueError(msg)
@@ -63,6 +82,17 @@ class ConstantHandler(
         return nodes.LiteralNode(ast_.value)
 
 
+class UnaryHandler(ExpressionHandler[ast.UnaryOp, nodes.UnaryExpressionNode]):
+    def satisfy(self, ast_: ast.AST) -> bool:
+        return isinstance(ast_, ast.UnaryOp)
+
+    def map(self, ast_: ast.UnaryOp, dispatch: Dispatch) -> nodes.UnaryExpressionNode:
+        return nodes.UnaryExpressionNode(
+            operator=_map_unary_op(ast_.op),
+            value=dispatch(ast_.operand),
+        )
+
+
 class BinaryHandler(
     ExpressionHandler[ast.BinOp, nodes.BinaryExpressionNode],
 ):
@@ -71,7 +101,7 @@ class BinaryHandler(
 
     def map(self, ast_: ast.BinOp, dispatch: Dispatch) -> nodes.BinaryExpressionNode:
         return nodes.BinaryExpressionNode(
-            operator=_map_op(ast_.op),
+            operator=_map_binary_op(ast_.op),
             left=dispatch(ast_.left),
             right=dispatch(ast_.right),
         )
@@ -89,7 +119,7 @@ class CompareHandler(
         left = dispatch(ast_.left)
         expressions = tuple(
             nodes.BinaryExpressionNode(
-                operator=_map_op(op),
+                operator=_map_binary_op(op),
                 left=left,
                 right=(left := dispatch(right)),
             )
@@ -120,9 +150,27 @@ class AllOfHandler(ExpressionHandler[ast.BoolOp, nodes.AllOfNode]):
         return nodes.AllOfNode(expressions=tuple(dispatch(i) for i in ast_.values))
 
 
+class FromContextAttributeHandler(
+    ExpressionHandler[ast.Attribute, nodes.FromContextNode]
+):
+    def __init__(self, alias: str = "ctx") -> None:
+        self._alias = alias
+
+    def satisfy(self, ast_: ast.AST) -> bool:
+        return (
+            isinstance(ast_, ast.Attribute)
+            and isinstance(ast_.value, ast.Name)
+            and ast_.value.id == self._alias
+        )
+
+    def map(self, ast_: ast.Attribute, dispatch: Dispatch) -> nodes.FromContextNode:  # noqa: ARG002
+        return nodes.FromContextNode(field_name=ast_.attr)
+
+
 def get_builtin_handlers() -> Sequence[ExpressionHandler[Any, Any]]:
     return [
         ConstantHandler(),
+        UnaryHandler(),
         BinaryHandler(),
         CompareHandler(),
         AnyOfHandler(),

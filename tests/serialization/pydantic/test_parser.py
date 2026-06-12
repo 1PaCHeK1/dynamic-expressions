@@ -5,8 +5,10 @@ from dynamic_expressions.serialization.pydantic import (
     BUILTIN_SCHEMAS,
     AllOfNodeSchema,
     AnyOfNodeSchema,
+    FromContextNodeSchema,
     LiteralNodeSchema,
     PydanticExpressionParser,
+    UnaryExpressionNodeSchema,
 )
 
 
@@ -82,4 +84,72 @@ def test_dump(parser: PydanticExpressionParser) -> None:
                 "value": True,
             },
         ],
+    }
+
+
+def test_parse_unary(parser: PydanticExpressionParser) -> None:
+    value = """{
+  "type": "unary",
+  "operator": "-",
+  "value": {
+    "type": "literal",
+    "value": 1
+  }
+}
+    """
+    result = parser.type_adapter.validate_json(value)
+    assert result == UnaryExpressionNodeSchema[Any](
+        type="unary",
+        operator="-",
+        value=LiteralNodeSchema(type="literal", value=1),
+    )
+
+
+def test_dump_unary(parser: PydanticExpressionParser) -> None:
+    node = UnaryExpressionNodeSchema[Any](
+        type="unary",
+        operator="-",
+        value=LiteralNodeSchema(type="literal", value=1),
+    )
+    result = parser.type_adapter.dump_python(
+        node,
+        mode="json",
+        warnings="none",
+    )
+    assert result == {
+        "type": "unary",
+        "operator": "-",
+        "value": {
+            "type": "literal",
+            "value": 1,
+        },
+    }
+
+
+def test_parse_from_context(parser: PydanticExpressionParser) -> None:
+    value = """{
+  "type": "from-context",
+  "field_name": "user.name"
+}
+    """
+    result = parser.type_adapter.validate_json(value)
+    assert result == FromContextNodeSchema[Any](
+        type="from-context",
+        field_name="user.name",
+    )
+
+
+def test_dump_from_context(parser: PydanticExpressionParser) -> None:
+    node = FromContextNodeSchema[Any](
+        type="from-context",
+        field_name="user.name",
+    )
+    result = parser.type_adapter.dump_python(
+        node,
+        mode="json",
+        warnings="none",
+    )
+    assert result == {
+        "type": "from-context",
+        "field_name": "user.name",
     }

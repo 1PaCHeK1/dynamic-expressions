@@ -4,7 +4,10 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
-    from dynamic_expressions.types import BinaryExpressionOperator
+    from dynamic_expressions.types import (
+        BinaryExpressionOperator,
+        UnaryExpressionOperator,
+    )
 
 
 @dataclass(slots=True, frozen=True, kw_only=True, unsafe_hash=True)
@@ -19,6 +22,12 @@ class AnyOfNode(Node):
 @dataclass(slots=True, frozen=True, kw_only=True, unsafe_hash=True)
 class AllOfNode(Node):
     expressions: tuple[Node, ...]
+
+
+@dataclass(slots=True, frozen=True, kw_only=True, unsafe_hash=True)
+class UnaryExpressionNode(Node):
+    operator: UnaryExpressionOperator
+    value: Node
 
 
 @dataclass(slots=True, frozen=True, kw_only=True, unsafe_hash=True)
@@ -51,3 +60,8 @@ class CaseNode(Node):
 class MatchNode(Node):
     cases: tuple[CaseNode, ...]
     default: Node | None = None
+
+
+@dataclass(slots=True, frozen=True, kw_only=True)
+class FromContextNode(Node):
+    field_name: str

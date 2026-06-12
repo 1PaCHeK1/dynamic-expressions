@@ -8,6 +8,7 @@ from dynamic_expressions.nodes import (
     CoalesceNode,
     LiteralNode,
     MatchNode,
+    UnaryExpressionNode,
 )
 from dynamic_expressions.serialization.pydantic import (
     AllOfNodeSchema,
@@ -17,6 +18,7 @@ from dynamic_expressions.serialization.pydantic import (
     CoalesceNodeSchema,
     LiteralNodeSchema,
     MatchNodeSchema,
+    UnaryExpressionNodeSchema,
 )
 
 
@@ -38,6 +40,19 @@ def test_binary() -> None:
         operator="+",
         left=LiteralNode(value=1),
         right=LiteralNode(value=1),
+    )
+    assert schema.to_node() == node
+
+
+def test_unary() -> None:
+    schema = UnaryExpressionNodeSchema[Any](
+        type="unary",
+        operator="-",
+        value=LiteralNodeSchema(type="literal", value=1),
+    )
+    node = UnaryExpressionNode(
+        operator="-",
+        value=LiteralNode(value=1),
     )
     assert schema.to_node() == node
 

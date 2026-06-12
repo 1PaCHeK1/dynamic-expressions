@@ -3,6 +3,7 @@ from collections.abc import Mapping, Sequence
 from contextlib import AsyncExitStack
 from typing import Any
 
+from dynamic_expressions.context.expression import Expression
 from dynamic_expressions.extensions import (
     OnVisitExtension,
 )
@@ -15,7 +16,7 @@ from dynamic_expressions.visitors import Visitor
 class VisitorDispatcher[Context: EmptyContext]:
     def __init__(
         self,
-        visitors: Mapping[type[Node], Visitor[Any, Context]],
+        visitors: Mapping[type[Node], Visitor[Any, Any]],
         extensions: Sequence[OnVisitExtension[Context]] = (),
         middlewares: Sequence[OnVisitMiddleware[Context]] = (),
     ) -> None:
@@ -25,9 +26,11 @@ class VisitorDispatcher[Context: EmptyContext]:
 
     async def visit(
         self,
-        node: Node,
+        node: Node | Expression[Any],
         context: Context,
     ) -> Any:  # noqa: ANN401
+        if isinstance(node, Expression):
+            node = node.node
         execution_context = ExecutionContext()
         return await self._visit(
             node=node,
