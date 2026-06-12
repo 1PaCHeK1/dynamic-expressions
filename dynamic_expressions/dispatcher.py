@@ -30,6 +30,7 @@ class VisitorDispatcher[Context: EmptyContext]:
         )
         result = await dispatcher.visit(expression_node, context)
         ```
+
     """
 
     def __init__(
@@ -44,6 +45,7 @@ class VisitorDispatcher[Context: EmptyContext]:
             visitors: Mapping from node class to the visitor that evaluates it.
             extensions: Lifecycle hooks entered before each node is visited.
             middlewares: Middleware chain wrapping the selected visitor.
+
         """
         self._visitors = visitors
         self._on_visit_exts = extensions
@@ -67,6 +69,7 @@ class VisitorDispatcher[Context: EmptyContext]:
 
         Returns:
             The evaluated result of ``node``.
+
         """
         if isinstance(node, Expression):
             node = node.node

@@ -36,6 +36,7 @@ class Dispatch[TContext: EmptyContext](Protocol):
 
         Returns:
             The evaluated result of ``node``.
+
         """
 
 
@@ -53,6 +54,7 @@ class Visitor[TNode: Node, TContext: EmptyContext]:
         )
         result = await dispatcher.visit(LiteralNode(value=1), None)
         ```
+
     """
 
     @abc.abstractmethod
@@ -72,6 +74,7 @@ class Visitor[TNode: Node, TContext: EmptyContext]:
 
         Returns:
             The computed value for ``node``.
+
         """
         ...
 
@@ -95,6 +98,7 @@ class AnyOfVisitor(Visitor[AnyOfNode, EmptyContext]):
 
         Returns:
             ``True`` if at least one child is truthy, otherwise ``False``.
+
         """
         for expr in node.expressions:
             value = await dispatch(expr, context)
@@ -122,6 +126,7 @@ class AllOfVisitor(Visitor[AllOfNode, EmptyContext]):
 
         Returns:
             ``True`` if all children are truthy, otherwise ``False``.
+
         """
         for expr in node.expressions:
             value = await dispatch(expr, context)
@@ -135,6 +140,7 @@ class UnaryExpressionVisitor(Visitor[UnaryExpressionNode, EmptyContext]):
 
     Attributes:
         operator_mapping: Built-in Python callables keyed by operator name.
+
     """
 
     operator_mapping: ClassVar[
@@ -167,6 +173,7 @@ class UnaryExpressionVisitor(Visitor[UnaryExpressionNode, EmptyContext]):
         Raises:
             ValueError: If ``node.operator`` is not registered in
                 ``operator_mapping``.
+
         """
         operator_callable = self.operator_mapping.get(node.operator)
         if operator_callable is None:
@@ -200,6 +207,7 @@ class BinaryExpressionVisitor(Visitor[BinaryExpressionNode, EmptyContext]):
 
     Attributes:
         operator_mapping: Built-in Python callables keyed by operator name.
+
     """
 
     operator_mapping: ClassVar[
@@ -245,6 +253,7 @@ class BinaryExpressionVisitor(Visitor[BinaryExpressionNode, EmptyContext]):
         Raises:
             ValueError: If ``node.operator`` is not registered in
                 ``operator_mapping``.
+
         """
         operator_callable = self.operator_mapping.get(node.operator)
         if operator_callable is None:
@@ -278,6 +287,7 @@ class LiteralVisitor(Visitor[LiteralNode, EmptyContext]):
 
         Returns:
             The literal value, or a tuple with nested nodes resolved.
+
         """
         if isinstance(node.value, (tuple, list)):
             return tuple(
@@ -308,6 +318,7 @@ class CoalesceVisitor(Visitor[CoalesceNode, EmptyContext]):
 
         Returns:
             The first truthy result, or ``None`` when every item is falsy.
+
         """
         for item in node.items:
             node_result = await dispatch(item, context)
@@ -335,6 +346,7 @@ class CaseVisitor(Visitor[CaseNode, EmptyContext]):
 
         Raises:
             ValueError: Always, to signal incorrect node usage.
+
         """
         msg = "Use CaseNode only in MatchNode"
         raise ValueError(msg)
@@ -366,6 +378,7 @@ class MatchVisitor(Visitor[MatchNode, EmptyContext]):
 
         Raises:
             ValueError: When no case matches and ``default`` is ``None``.
+
         """
         for case_ in node.cases:
             if await dispatch(case_.expression, context):
@@ -403,6 +416,7 @@ class FromContextNodeVisitor[TContext](Visitor[FromContextNode, TContext]):
         Raises:
             AttributeError: When the field path cannot be resolved on
                 ``context``.
+
         """
         try:
             return _visit_getattr(context, node.field_name)

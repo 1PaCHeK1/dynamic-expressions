@@ -28,6 +28,7 @@ class AnyOfNode(Node):
 
     Attributes:
         expressions: Child nodes are evaluated in order until one of them is truthy.
+
     """
 
     expressions: tuple[Node, ...]
@@ -42,6 +43,7 @@ class AllOfNode(Node):
 
     Attributes:
         expressions: Child nodes are evaluated in order; all must be truthy.
+
     """
 
     expressions: tuple[Node, ...]
@@ -57,6 +59,7 @@ class UnaryExpressionNode(Node):
     Attributes:
         operator: Unary operator name, for example ``"not"`` or ``"-"``.
         value: Operand is evaluated before the operator is applied.
+
     """
 
     operator: UnaryExpressionOperator
@@ -74,6 +77,7 @@ class BinaryExpressionNode(Node):
         operator: Binary operator name, for example ``"="`` or ``"+"``.
         left: Left-hand operand.
         right: Right-hand operand.
+
     """
 
     operator: BinaryExpressionOperator
@@ -91,6 +95,7 @@ class LiteralNode(Node):
 
     Attributes:
         value: Constant payload, or a collection that may contain nested nodes.
+
     """
 
     value: Any
@@ -109,6 +114,7 @@ class CoalesceNode(Node):
 
     Attributes:
         items: Candidates are evaluated in order; the first truthy result wins.
+
     """
 
     items: tuple[Node, ...]
@@ -125,6 +131,7 @@ class CaseNode(Node):
     Attributes:
         expression: Condition is evaluated to decide whether this branch matches.
         value: Result is returned when the condition is truthy.
+
     """
 
     expression: Node
@@ -133,8 +140,7 @@ class CaseNode(Node):
 
 @dataclass(slots=True, frozen=True, kw_only=True)
 class MatchNode(Node):
-    """Pattern match over a sequence of [CaseNode][dynamic_expressions.nodes.CaseNode]
-    branches.
+    """Pattern match over ``CaseNode`` branches.
 
     Returns the value of the first case whose condition is truthy, or the
     optional default branch. Pair with
@@ -143,6 +149,7 @@ class MatchNode(Node):
     Attributes:
         cases: Branches are tested in order.
         default: Fallback node is returned if no case matches.
+
     """
 
     cases: tuple[CaseNode, ...]
@@ -159,6 +166,7 @@ class FromContextNode(Node):
 
     Attributes:
         field_name: Attribute path is resolved from the dispatcher context.
+
     """
 
     field_name: str
