@@ -1,10 +1,10 @@
 # AST
 
-Store rules as strings in configuration or a database and parse them into node trees at runtime.
+Store rules as strings in the configuration or database and parse them into node trees at runtime.
 
 ## Scenario
 
-Product rules live in plain text. At startup the service parses each rule once and reuses the resulting nodes for every request.
+Product rules are stored in plain text. At startup the service parses each rule once and reuses the resulting nodes for each request.
 
 ## Parse Python-like expressions
 

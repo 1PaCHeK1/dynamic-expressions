@@ -5,18 +5,14 @@
 ## Core model
 
 ```mermaid
-flowchart TB
-    expr[Expression_DSL] -->|.node| rootNode[Node_tree]
-    parser[Parsers_AST_Pydantic] --> rootNode
-    rootNode --> dispatcher[VisitorDispatcher.visit]
-    dispatcher --> ext[Extensions_on_visit]
-    ext --> cache{ExecutionContext.cache}
-    cache -->|hit| resultValue[Result]
-    cache -->|miss| mw[Middlewares]
-    mw --> visitor[Visitor.visit]
-    visitor -->|dispatch_children| dispatcher
-    visitor --> resultValue
+flowchart LR
+    dsl[Context DSL] -->|.node| nodes[Node tree]
+    ast[AST parser] --> nodes
+    pydantic[Pydantic JSON] -->|".to_node()"| nodes
+    nodes --> visit[dispatcher.visit]
 ```
+
+Nodes describe the structure; visitors evaluate it. The dispatcher maps node types to visitors and runs hooks around each evaluation step.
 
 ## Building expressions
 
@@ -32,12 +28,44 @@ All paths produce the same immutable `Node` trees evaluated by the dispatcher.
 
 ## Evaluation pipeline
 
+Each `await dispatcher.visit(node, context)` creates an `ExecutionContext`. Every node — the root and each child visited via `dispatch()` — goes through the same steps shown below.
+
+```mermaid
+sequenceDiagram
+    participant Caller
+    participant Disp as VisitorDispatcher
+    participant Ext as Extension
+    participant MW as Middleware
+    participant Visitor
+
+    Caller->>Disp: visit(node, context)
+
+    loop each node
+        Disp->>Ext: enter on_visit(node,context,execution_context)
+        Note over Ext: wraps cache check, middleware, and visitor
+
+        Disp->>MW: on_visit with call_next
+        MW->>Visitor: visit via call_next
+        Visitor-->>MW: result
+        MW-->>Disp: result
+
+        opt child nodes
+            Visitor->>Disp: dispatch(child_node, context)
+            Note over Disp: same pipeline for each child
+        end
+
+        Ext-->>Disp: exit on_visit()
+    end
+
+    Disp-->>Caller: result
+```
+
 When you call `await dispatcher.visit(node, context)`:
 
-1. **Extensions** — each registered `OnVisitExtension` enters an async context manager for the current node. Cache extensions may populate `ExecutionContext.cache` before the visitor runs.
+1. **Extensions** — each registered `OnVisitExtension` enters an async context manager that wraps the rest of the node scope.
 2. **Per-call cache** — if the node was already evaluated in this `visit` call, return the memoized result.
-3. **Middlewares** — optional chain that wraps the visitor (logging, timing, etc).
-4. **Visitor** — evaluates the node. Composite nodes call `dispatch(child, context)` to evaluate children recursively.
+3. **Middlewares** — optional chain that wraps the call to `Visitor.visit`. Each middleware receives `call_next` and invokes the next layer (another middleware, or the visitor at the end of the chain).
+4. **Visitor** — `Visitor.visit(node, dispatch, context)` evaluates the node. Composite visitors call `dispatch(child, context)`, which re-enters `VisitorDispatcher._visit` for each child with the full pipeline above.
 5. **Store result** — the return value is cached in `ExecutionContext` for the remainder of the call.
 
 ## Context
@@ -49,7 +77,7 @@ When you call `await dispatcher.visit(node, context)`:
 ## Serialization and caching
 
 - [Serialization](../serialization/index.md) converts node trees to/from bytes or JSON for storage and transport.
-- [Cache extensions](../extending/extensions.md) persist evaluation results in Redis (or a custom backend) across requests.
+- [Cache extensions](../advanced/extensions/index.md) persist evaluation results in Redis (or a custom backend) across requests.
 
 ## Next steps
 

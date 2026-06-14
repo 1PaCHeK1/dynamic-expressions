@@ -1,6 +1,6 @@
-# MsgSpec serialization
+# MsgSpec serializers
 
-Fast JSON encoding/decoding for cache values via [msgspec](https://jcristharif.com/msgspec/).
+Fast JSON encoding/decoding for **cache values** via [msgspec](https://msgspec.dev/).
 
 Install the optional dependency:
 
@@ -10,7 +10,7 @@ pip install dynamic-expressions[serialization-msgspec]
 
 ## MsgSpecScalarSerializer
 
-Used as the default serializer in [Redis cache extensions](../extending/extensions.md). Handles JSON-compatible scalars (`bool`, `int`, `float`, `str`, `None`, lists, dicts).
+Used as the default serializer in [Redis cache extensions](../advanced/extensions/cache.md). Handles JSON-compatible scalars (`bool`, `int`, `float`, `str`, `None`, lists, dicts).
 
 ::: dynamic_expressions.serialization.msgspec.MsgSpecScalarSerializer
 
@@ -45,6 +45,11 @@ payload = serializer.serialize(user)
 assert serializer.deserialize(payload) == user
 ```
 
-Pass a per-policy `serializer` on [CachePolicy](../extending/extensions.md#cachepolicy) when cached values are not plain scalars.
+Pass a per-policy `serializer` on [CachePolicy](../advanced/extensions/cache.md#cachepolicy) when cached values are not plain scalars.
 
 See the [Cache cookbook](../cookbook/cache.md) for Redis integration.
+
+## See also
+
+- [Serialization overview](index.md) — parsers vs serializers
+- [Pydantic serializers](pydantic.md#pydanticserializer) — validated cache values

@@ -1,6 +1,8 @@
-# AST serialization
+# AST parsing
 
-Parse Python-like expression strings into node trees using `ExpressionEvalParser`. The parser walks a restricted Python AST and maps nodes via pluggable handlers.
+Parse Python-like expression strings into [Node](../concepts/nodes.md) trees using [`ExpressionEvalParser`](index.md#parsers).
+
+Walk a restricted Python AST and map nodes via pluggable handlers.
 
 ## ExpressionEvalParser
 
@@ -81,3 +83,8 @@ Add your handler to the parser's `handlers` list. Handlers are tried in order; t
 ::: dynamic_expressions.serialization.ast.handlers.ExpressionHandler
 
 Full recipe: [AST cookbook](../cookbook/ast.md).
+
+## See also
+
+- [Serialization overview](index.md) — parsers vs serializers
+- [Pydantic integration](pydantic.md) — JSON expression schemas

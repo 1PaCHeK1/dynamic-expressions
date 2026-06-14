@@ -1,6 +1,6 @@
 # Custom nodes
 
-Extend the library by defining a new node dataclass and a matching visitor, then registering both in the dispatcher.
+Extend the library by defining a new node dataclass and matching a visitor, then register both in the dispatcher.
 
 ## Step 1 — Define the node
 
@@ -57,11 +57,11 @@ async def main() -> None:
 asyncio.run(main())
 ```
 
-Every node type that can appear in your tree must have a registered visitor. Missing registrations raise `KeyError` at evaluation time.
+Each node type that can appear in your tree must have a registered visitor. Missing registrations raise `KeyError` at evaluation time.
 
 ## Serialization
 
-Built-in [Pydantic](../serialization/pydantic.md) and [AST](../serialization/ast.md) parsers only know about standard nodes. For custom nodes:
+Built-in [Pydantic](../serialization/pydantic.md) and [AST](../serialization/ast.md) parsers recognize only standard nodes. For custom nodes:
 
 - Add a Pydantic schema with `to_node()` and register it in `PydanticExpressionParser(types=...)`.
 - Or add an `ExpressionHandler` for the AST parser.

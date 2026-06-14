@@ -1,6 +1,6 @@
 # Cache
 
-Skip repeated work when the same node is evaluated many times with identical context.
+Skip repeated visit when the same node is evaluated multiple times with identical context.
 
 Install optional dependencies:
 
@@ -18,7 +18,7 @@ You also need a running Redis-compatible server (Valkey works too).
 
 1. Before a node is visited, `RedisCacheExtension` looks up a cache key produced by the matching [CachePolicy](../advanced/extensions/cache.md#cachepolicy).
 2. On a hit, the deserialized value is stored in the per-call `ExecutionContext` cache and visitors are skipped for that node.
-3. After evaluation, changed results are written back to Redis with the configured TTL.
+3. After evaluation, changed the results are written back to Redis with the configured TTL.
 
 Policies are matched by node type. Use a custom `key` when the same node shape must produce different cache entries for different contexts:
 
@@ -35,9 +35,9 @@ Provide a dedicated `serializer` on the policy when cached values are not plain 
 
 ## Scenario
 
-A discount service evaluates a dynamic rule on every checkout. Results depend only on the node structure, not on request context, so they are safe to cache in Redis for a short TTL.
+The discount service evaluates the dynamic rule on every checkout. Results depend only on the node structure, not on the request context, so they are safe to cache in Redis for a short TTL.
 
-The example below caches all standard node types — useful to show wiring, but **not** how you should structure production policies. See [Targeted caching](#targeted-caching-with-cachenode) for the recommended approach.
+The example below caches all standard node types—this is useful for demonstration, but should not be used in production policies. See [Targeted caching](#targeted-caching-with-cachenode) for the recommended approach.
 
 ## Wire Redis into the dispatcher
 

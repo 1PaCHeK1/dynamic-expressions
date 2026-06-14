@@ -31,7 +31,7 @@ policy = CachePolicy[MyContext](
 )
 ```
 
-When results depend on context, include context fields in the key:
+When the results depend on context, include context fields in the key:
 
 ```python
 CachePolicy[UserContext](
@@ -47,7 +47,7 @@ Redis-backed implementation. Requires `pip install dynamic-expressions[cache-red
 
 ::: dynamic_expressions.cache.redis.RedisCacheExtension
 
-See the [Cache cookbook](../cookbook/cache.md) for a full wiring example.
+See the [Cache cookbook](../../cookbook/cache.md) for a full wiring example.
 
 ## Writing a custom backend
 
@@ -72,4 +72,4 @@ class InMemoryCacheExtension[Context](CacheExtension[Context]):
         self._store[key] = value
 ```
 
-Use a [Serializer](../serialization/index.md) compatible with your cached value types.
+Use a [Serializer](../../serialization/index.md) compatible with your cached value types.

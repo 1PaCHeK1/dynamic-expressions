@@ -4,7 +4,7 @@ Combine rules loaded from external storage with static checks written in the [co
 
 ## Scenario
 
-An access-control service stores tenant-specific rules in a database as plain strings (`"ctx.age >= 18"`). Operators can edit them without redeploying the app. Some checks stay hardcoded in code — for example, administrators always pass regardless of other rules.
+An access-control service stores tenant-specific rules in the database as plain strings (`"ctx.age >= 18"`). Operators can edit them without redeploying the app. Some checks stay hardcoded in code — for example, administrators always get access regardless of other rules.
 
 At startup (or on cache invalidation) the service parses DB rules once, merges them with static expressions, and evaluates the combined tree on every request.
 
@@ -18,7 +18,7 @@ class UserContext(Context):
     is_admin: Mapped[bool]
 ```
 
-Fields accessed as `UserContext.is_admin` become [FromContextNode](../concepts/nodes.md#from-context) nodes. Parsed strings use the same context via `ctx.age`, `ctx.is_admin`, and so on — as long as `FromContextAttributeHandler` is registered on the parser.
+Fields accessed as `UserContext.is_admin` become [FromContextNode](../concepts/nodes.md#from-context) nodes.
 
 ## Load a rule from the database
 
@@ -64,7 +64,7 @@ final_rule = Expression(rule_from_db) | static_rule
 
 ## Evaluate
 
-Register all node types that can appear in either branch, including nodes produced by the parser:
+Register all node types that can appear in any of the branches, including nodes produced by the parser:
 
 ```python
 import asyncio
@@ -92,6 +92,7 @@ async def main() -> None:
     final_rule = Expression(rule_from_db) | static_rule
 
     for ctx in [
+        UserContext(age=20, is_admin=False),  # too young, not admin → True
         UserContext(age=10, is_admin=False),  # too young, not admin → False
         UserContext(age=2, is_admin=True),    # admin bypass → True
     ]:
@@ -105,25 +106,11 @@ asyncio.run(main())
 Output:
 
 ```
+True
 False
 True
 ```
 
-## Combining multiple DB rules
-
-Load several rows and merge them with static guards:
-
-```python
-db_rules = [parser.parse(source) for source in RULES_FROM_DB.values()]
-
-combined_from_db = Expression(db_rules[0])
-for extra in db_rules[1:]:
-    combined_from_db = combined_from_db & Expression(extra)
-
-final_rule = combined_from_db | UserContext.is_admin
-```
-
-Use `&` when every DB rule must pass; use `|` when any rule is enough — same as in the [Basic](basic.md) recipe, but one side of the tree comes from parsed strings.
 
 ## Related recipes
 

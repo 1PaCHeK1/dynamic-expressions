@@ -43,7 +43,7 @@ can_manage_projects = UserContext.is_admin | (
 is_guest = not_(UserContext.is_admin)
 ```
 
-The expression reads like Python, but builds an immutable AST under the hood:
+The expression is read by Python, but an immutable node is built internally:
 
 ```python
 assert isinstance(can_manage_projects.node, AnyOfNode)

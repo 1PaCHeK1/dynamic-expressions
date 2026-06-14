@@ -1,6 +1,6 @@
 # Visitors
 
-A **visitor** defines how a concrete node type is evaluated. Register visitors in a [VisitorDispatcher](dispatcher.md) mapping from node class to visitor instance.
+A **visitor** defines how a concrete node type is evaluated. Register visitors in a [VisitorDispatcher](dispatcher.md) mapping from the node class to the visitor instance.
 
 Each visitor receives:
 
@@ -20,8 +20,8 @@ Each visitor receives:
 | Visitor | Node | Behavior |
 |---------|------|----------|
 | `LiteralVisitor` | `LiteralNode` | Returns the constant; resolves nested nodes in collections |
-| `AnyOfVisitor` | `AnyOfNode` | Logical OR — returns True if at least one child truthy |
-| `AllOfVisitor` | `AllOfNode` | Logical AND — returns True if all children truthy |
+| `AnyOfVisitor` | `AnyOfNode` | Logical OR — returns True if at least one child is truthy |
+| `AllOfVisitor` | `AllOfNode` | Logical AND — returns True if all children are truthy |
 | `UnaryExpressionVisitor` | `UnaryExpressionNode` | Applies unary operator |
 | `BinaryExpressionVisitor` | `BinaryExpressionNode` | Applies binary operator |
 | `CoalesceVisitor` | `CoalesceNode` | First truthy child, or `None` |
@@ -103,4 +103,4 @@ dispatcher = VisitorDispatcher(
 )
 ```
 
-See [Custom nodes](../extending/custom-nodes.md) for adding entirely new node types.
+See [Custom nodes](../advanced/custom-nodes.md) for adding entirely new node types.

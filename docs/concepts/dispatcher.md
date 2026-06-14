@@ -1,6 +1,6 @@
 # Dispatcher
 
-`VisitorDispatcher` is the entry point for evaluating expression trees. It selects a visitor by concrete node type, runs optional extensions and middlewares, and memoizes results per node for the duration of a single `visit` call.
+`VisitorDispatcher` is the entry point for evaluating expression trees. It selects a visitor by a concrete node type, runs optional extensions and middlewares, and memoizes the results for each node within a single `visit` call.
 
 ::: dynamic_expressions.dispatcher.VisitorDispatcher
     options:
@@ -15,7 +15,7 @@ The dispatcher accepts three optional hook layers:
 | Parameter | Type | Purpose |
 |-----------|------|---------|
 | `visitors` | `Mapping[type[Node], Visitor]` | Required — maps each node class to its evaluator |
-| `extensions` | `Sequence[OnVisitExtension]` | Async context managers entered before each node visit |
+| `extensions` | `Sequence[OnVisitExtension]` | Async context managers are entered before each node is visited |
 | `middlewares` | `Sequence[OnVisitMiddleware]` | Middleware chain wrapping the selected visitor |
 
 ```python
@@ -43,7 +43,7 @@ result = await dispatcher.visit(node, None)  # 3
 
 ## Execution flow
 
-1. Extensions run first (for example, [Redis cache lookup](../extending/extensions.md)).
+1. Extensions run first (for example, [Redis cache lookup](../advanced/extensions/index.md)).
 2. If the node is already in `ExecutionContext.cache`, the cached value is returned.
 3. Middlewares wrap the visitor call.
 4. The visitor evaluates the node, using `dispatch` for children.
@@ -56,5 +56,5 @@ Per-call memoization means the same node instance evaluated twice within one `vi
 ## Related topics
 
 - [Architecture](architecture.md) — full evaluation pipeline
-- [Extensions](../extending/extensions.md) — cross-cutting hooks (caching, metrics)
-- [Middlewares](../extending/middlewares.md) — wrap individual visitor calls
+- [Extensions](../advanced/extensions/index.md) — cross-cutting hooks (caching, metrics)
+- [Middlewares](../advanced/middlewares.md) — wrap individual visitor calls

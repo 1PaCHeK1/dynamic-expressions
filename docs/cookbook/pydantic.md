@@ -139,4 +139,4 @@ assert profile_field.to_node().field_name == "user.name"
 assert negated.to_node().operator == "-"
 ```
 
-Each schema exposes `.to_node()` so the same validated object can be evaluated immediately or saved for later.
+Each schema exposes `.to_node()` so the same validated object can be immediately evaluated or saved for later.

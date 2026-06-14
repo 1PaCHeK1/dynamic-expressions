@@ -27,7 +27,7 @@ class AnyOfNode(Node):
     Pair with [AnyOfVisitor][dynamic_expressions.visitors.AnyOfVisitor].
 
     Attributes:
-        expressions: Child nodes are evaluated in order until one of them is truthy.
+        expressions: Child nodes evaluated in order until one of them is truthy.
 
     """
 
@@ -42,7 +42,7 @@ class AllOfNode(Node):
     Pair with [AllOfVisitor][dynamic_expressions.visitors.AllOfVisitor].
 
     Attributes:
-        expressions: Child nodes are evaluated in order; all must be truthy.
+        expressions: Child nodes evaluated in order; all must be truthy.
 
     """
 
@@ -113,7 +113,7 @@ class CoalesceNode(Node):
     [CoalesceVisitor][dynamic_expressions.visitors.CoalesceVisitor].
 
     Attributes:
-        items: Candidates are evaluated in order; the first truthy result wins.
+        items: Candidates evaluated in order; the first truthy result wins.
 
     """
 
@@ -129,8 +129,8 @@ class CaseNode(Node):
     [MatchVisitor][dynamic_expressions.visitors.MatchVisitor].
 
     Attributes:
-        expression: Condition is evaluated to decide whether this branch matches.
-        value: Result is returned when the condition is truthy.
+        expression: Condition evaluated to decide whether this branch matches.
+        value: Result returned when the condition is truthy.
 
     """
 
@@ -147,7 +147,7 @@ class MatchNode(Node):
     [MatchVisitor][dynamic_expressions.visitors.MatchVisitor].
 
     Attributes:
-        cases: Branches are tested in order.
+        cases: Branches tested in order.
         default: Fallback node is returned if no case matches.
 
     """

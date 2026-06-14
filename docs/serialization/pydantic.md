@@ -1,11 +1,11 @@
-# Pydantic serialization
+# Pydantic parser and serilizer
 
-The `dynamic_expressions.serialization.pydantic` module covers two related tasks:
+The `dynamic_expressions.serialization.pydantic` module covers **two roles** (see [Serialization overview](index.md)):
 
-| Component | Purpose |
-|-----------|---------|
-| [PydanticExpressionParser](#expression-trees) | Parse and validate expression trees as JSON |
-| [PydanticSerializer](#pydanticserializer) | Serialize arbitrary Pydantic-validated values to bytes |
+| Component | Role | Purpose |
+|-----------|------|---------|
+| [PydanticExpressionParser](#expression-trees) | **Parser** | Parse and validate expression trees as JSON → `Node` |
+| [PydanticSerializer](#pydanticserializer) | **Serializer** | Encode/decode arbitrary Pydantic-validated values to `bytes` for cache |
 
 Install the optional dependency:
 
@@ -35,7 +35,7 @@ Each schema has a discriminated `type` field (for example `"literal"`, `"binary"
 
 ### PydanticExpressionParser
 
-Builds a Pydantic `TypeAdapter` over a union of registered schemas. Use `type_adapter.validate_json()` to parse incoming JSON and `.to_node()` on the result.
+Builds a Pydantic `TypeAdapter` over a union of registered schemas. Use `type_adapter.validate_json()` to parse the incoming JSON and `.to_node()` on the result.
 
 ::: dynamic_expressions.serialization.pydantic.PydanticExpressionParser
 
@@ -155,7 +155,7 @@ assert serializer.deserialize(payload) == instance
 
 ### Use with cache policies
 
-When cached evaluation results are Pydantic models rather than plain scalars, pass a `PydanticSerializer` as the per-policy `serializer` on [CachePolicy](../advanced/extensions/cache.md):
+When the cached evaluation results are Pydantic models rather than plain scalars, pass a `PydanticSerializer` as the per-policy `serializer` on [CachePolicy](../advanced/extensions/cache.md):
 
 ```python
 policy = CachePolicy[MyContext](
@@ -166,9 +166,10 @@ policy = CachePolicy[MyContext](
 )
 ```
 
-For JSON-compatible scalars, [MsgSpecScalarSerializer](msgspec.md) is lighter. Choose `PydanticSerializer` when you need schema validation on read.
+For JSON-compatible scalars, the preferred [MsgSpecScalarSerializer](msgspec.md) is used. Choose `PydanticSerializer` when you require schema validation on read.
 
 ## See also
 
+- [Serialization overview](index.md) — parsers & serializers
 - [Pydantic cookbook](../cookbook/pydantic.md) — end-to-end API scenario
-- [MsgSpec serialization](msgspec.md) — fast scalar encoding for Redis cache
+- [MsgSpec serializers](msgspec.md) — fast scalar encoding for Redis cache

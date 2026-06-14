@@ -1,6 +1,6 @@
 # Context DSL
 
-The context DSL lets you compose expression trees using Python syntax. Subclass `Context` with `Mapped` fields — accessing a field on the class returns an `Expression` that builds a [FromContextNode](nodes.md#from-context) automatically.
+The context DSL allows you to compose expression trees using Python syntax. Subclass `Context` with `Mapped` fields — accessing the class field returns an `Expression` that builds a [FromContextNode](nodes.md#from-context) automatically.
 
 ::: dynamic_expressions.context.model.Context
 
@@ -30,6 +30,10 @@ class Settings(Context):
 ```
 
 ## Expression operators
+
+::: dynamic_expressions.context.expression.Expression
+    options:
+      members: false
 
 `Expression` overloads Python operators to build node trees without calling constructors directly:
 

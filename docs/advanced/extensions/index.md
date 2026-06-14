@@ -32,4 +32,4 @@ dispatcher = VisitorDispatcher(
 )
 ```
 
-Pass extensions to `VisitorDispatcher(extensions=[...])`. They run in order for every node in the tree.
+Pass extensions to `VisitorDispatcher(extensions=[...])`. They are run in order for each node in the tree.

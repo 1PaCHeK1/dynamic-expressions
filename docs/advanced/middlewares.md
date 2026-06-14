@@ -1,6 +1,6 @@
 # Middlewares
 
-Middlewares wrap individual visitor calls. Unlike [extensions](extensions.md) (async context managers around each node), middlewares form a chain similar to HTTP middleware: each layer receives `call_next` and decides when to invoke the visitor.
+Middlewares wrap individual visitor calls. Unlike [extensions](./extensions/index.md) (async context managers around each node), middlewares form a chain similar to HTTP middleware: each layer receives `call_next` and decides when to invoke the visitor.
 
 ::: dynamic_expressions.middlewares.OnVisitMiddleware
 
@@ -42,7 +42,7 @@ dispatcher = VisitorDispatcher(
 )
 ```
 
-Multiple middlewares run in registration order — the first listed is the outermost wrapper.
+Multiple middlewares run in the registration order — the first-listed is the outermost wrapper.
 
 ## Short-circuiting
 
@@ -65,6 +65,6 @@ class DenylistMiddleware[Context](OnVisitMiddleware[Context]):
 |---|-----------|-------------|
 | Interface | Async context manager | `on_visit` + `call_next` |
 | Typical use | Caching, tracing spans, resource setup | Logging, timing, result transformation |
-| Runs when | Before cache check populates from extension | After cache miss, before visitor |
+| Runs when | Before processing by the Visitor and Middlewares | After Extensions and missing cache (`ExecutionContext.cache`), before Visitor |
 
 Both can be combined on the same dispatcher.

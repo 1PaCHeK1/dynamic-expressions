@@ -16,9 +16,8 @@ from dynamic_expressions.visitors import Visitor
 class VisitorDispatcher[Context: EmptyContext]:
     """Resolve and evaluate expression nodes with registered visitors.
 
-    The dispatcher selects a visitor by concrete node type, runs optional
-    extensions and middlewares, and caches results per node for the duration
-    of a single ``visit`` call.
+    The dispatcher selects a visitor by a concrete node type, runs optional
+    extensions and middlewares, and caches the results for each node within a single ``visit`` call.
 
     Example:
         ```python
@@ -43,7 +42,7 @@ class VisitorDispatcher[Context: EmptyContext]:
 
         Args:
             visitors: Mapping from node class to the visitor that evaluates it.
-            extensions: Lifecycle hooks entered before each node is visited.
+            extensions: Lifecycle hooks are entered before each node is visited.
             middlewares: Middleware chain wrapping the selected visitor.
 
         """

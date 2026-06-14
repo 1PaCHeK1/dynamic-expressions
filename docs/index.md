@@ -59,7 +59,7 @@ asyncio.run(main())
 |---------|-------------|
 | [Getting started](getting-started.md) | Quickstart in five minutes |
 | [Concepts](concepts/architecture.md) | Architecture, nodes, visitors, dispatcher, DSL |
-| [Extending](extending/custom-nodes.md) | Custom nodes, extensions, middlewares |
+| [Advanced](advanced/custom-nodes.md) | Custom nodes, extensions, middlewares |
 | [Serialization](serialization/index.md) | Pydantic, AST, MsgSpec |
 | [Cookbook](cookbook/index.md) | End-to-end recipes |
 
