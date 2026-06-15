@@ -1,6 +1,6 @@
 [project]
 name = "dynamic-expressions"
-version = "0.2.2"
+version = "0.2.3"
 description = ""
 readme = "README.md"
 license = { text = "MIT" }
@@ -146,7 +146,7 @@ ban-relative-imports = "parents"
 
 [tool.commitizen]
 name = "cz_conventional_commits"
-version = "0.2.2"
+version = "0.2.3"
 tag_format = "$major.$minor.$patch"
 version_scheme = "pep440"
 version_provider = "pep621"

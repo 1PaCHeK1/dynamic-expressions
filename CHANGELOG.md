@@ -1,3 +1,13 @@
+## 0.2.3 (2026-06-15)
+
+### Feat
+
+- add support for unary expressions and context-based nodes
+
+### Fix
+
+- docs linter
+
 ## 0.2.2 (2026-05-24)
 
 ### Feat
