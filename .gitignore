@@ -19,3 +19,9 @@ coverage.xml
 
 # VsCode
 .vscode
+
+# Docs
+site/
+
+# Local files
+local/

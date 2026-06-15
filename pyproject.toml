@@ -32,8 +32,10 @@ dev = [
     "deptry>=0.25.1",
     "mkdocs>=1.6.1",
     "mkdocs-material>=9.6.12",
+    "mkdocs-mermaid2-plugin>=1.2.3",
     "mkdocstrings[python]>=0.29.1",
     "mypy>=2.1.0",
+    "pymdown-extensions>=10.21.3",
     "pytest>=9.0.3",
     "redis>=5.2.1",
     "ruff>=0.15.12",
@@ -112,7 +114,7 @@ ignore = [
     "E501", # Line Length
     "D10", # Disable mandatory docstrings
     "D203", # one-blank-line-before-class
-    "D212", # multi-line-summary-first-line
+    "D213", # multi-line-summary-second-line
     "PD", # pandas-vet
     "EXE",
     "COM812",  # ruff format conflict
